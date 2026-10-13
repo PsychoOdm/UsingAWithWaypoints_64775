@@ -1,12 +1,12 @@
 using UnityEngine;
-using System.Collection.Generic;
-using System.Collection;
+using System.Collections.Generic;
+using System.Collections;
 
 public class Graph 
 {
     List<Edge> edge = new List<Edge>();
     List<Node> nodes = new List<Node>();
-    List<Node> pathList = new List<Node();
+    List<Node> pathList = new List<Node>();
 
     public Graph(){ }
 
@@ -21,7 +21,7 @@ public class Graph
         Node from = FindNode(fromNode);
         Node to = FindNode (toNode);
 
-        if(from !=null && to != null)
+        if(from != null && to != null)
         {
             Edge e = new Edge(from, to);
             edge.Add(e);
@@ -33,7 +33,7 @@ public class Graph
     {
         foreach (Node n in nodes)
         {
-            if (n.getId() ==id)
+            if (n.getId() == id)
             return n;
         }
         return null;
@@ -52,20 +52,20 @@ public class Graph
         List<Node> open = new List<Node>();
         List<Node> closed = new List<Node>();
         float tentative_g_score = 0;
-        float tentative_is_better;
+        bool tentative_is_better = false;
 
-        star.g=0;
-        star.h= distance(star, end);
-        star.f= star.h;
+        start.g = 0;
+        start.h = distance(start, end);
+        start.f = start.h;
 
         open.Add(start);
         while(open.Count > 0)
         {
             int i = lowestF(open);
             Node thisNode = open[i];
-            if (thisNode.getId()== endId)
+            if (thisNode.getId() == endId)
             {
-                //ReconstructPath(start, end);
+                ReconstructPath(start, end);
                 return true;
             }
 
@@ -79,30 +79,43 @@ public class Graph
                if (closed.IndexOf(neighbour) > -1)
                 continue;
 
-                tentative_g_score = thisNode.g + distance(thisNode, neighbour);
-                if(open.IndexOf(neighbour)== -1)
-                {
-                    open.Add(neighbour);
-                    tentative_is_better = true;
-                }
+               tentative_g_score = thisNode.g + distance(thisNode, neighbour);
+               if(open.IndexOf(neighbour) == -1)
+               {
+                   open.Add(neighbour);
+                   tentative_is_better = true;
+               }
+               else if (tentative_g_score < neighbour.g)
+               {
+                   tentative_is_better = true;
+               }
+               else 
+                   tentative_is_better = false;
 
-                else if (tentative_g_score < neighbour.g)
-                {
-                    tentative_is_better = true;
-                }
-                else 
-                tentative_is_better = false;
-
-                if (tentative_is_better)
-                {
-                    neighbour.cameFrom = thisNode;
-                    neighbour.g = tentative_g_score;
-                    neighbour.h = distance(thisNode, end);
-                    neighbour.f = neighbour.g + neighbour.h;
-                }
+               if (tentative_is_better)
+               {
+                   neighbour.cameFrom = thisNode;
+                   neighbour.g = tentative_g_score;
+                   neighbour.h = distance(neighbour, end); // Nota: corrigido de thisNode para neighbour
+                   neighbour.f = neighbour.g + neighbour.h;
+               }
             }
         }
-        return false,
+        return false;
+    }
+
+    public void ReconstructPath(Node startNode, Node endNode)  
+    {
+        pathList.Clear();
+        pathList.Add(endNode);
+
+        var p = endNode.cameFrom;
+        while (p != startNode && p != null)
+        {
+            pathList.Insert(0, p);
+            p = p.cameFrom;
+        }
+        pathList.Insert(0, startNode); // Insere o nó inicial no início da lista
     }
 
     float distance(Node a, Node b)
@@ -112,19 +125,16 @@ public class Graph
 
     int lowestF(List<Node> l)
     {
-        float lowestf = 0;
-        int count = 0;
+        float lowestf = l[0].f;
         int iteratorCount = 0;
 
-        lowestf = l[0].f;
-
-        for (int i = 1; i< l.Count; i++)
+        for (int i = 1; i < l.Count; i++)
         {
             if(l[i].f <= lowestf)
             {
-                lowestf = count;
+                lowestf = l[i].f;
+                iteratorCount = i;
             }
-            count++;
         }
         return iteratorCount;
     }

@@ -1,6 +1,6 @@
 using UnityEngine;
-using System.Collection.Generic;
-using System.Collection;
+using System.Collections.Generic;
+using System.Collections;
 
 public class Edge 
 {
@@ -11,8 +11,5 @@ public class Edge
     {
         startNode = from;
         endNode = to;
-    }
-        
+    }       
 }
-
-   
